@@ -6,11 +6,13 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 #include <windows.h>
 
 /* Window class name */
 #define WND_CLASS_NAME "My Window Class"
+
 #define M_PI 3.14159265358979323846
 
 /* Forward references */
@@ -69,7 +71,9 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   DOUBLE alpha, beta, gamma;
+  CHAR Data[50];
   HDC hDC;
+  HPEN hPen, hOldPen;
   PAINTSTRUCT ps;
   SYSTEMTIME lt;
   static INT w, h;
@@ -103,28 +107,56 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   case WM_MOUSEMOVE:
     InvalidateRect(hWnd, NULL, FALSE);
     return 0;
+  case WM_ERASEBKGND:
+    return 0;
   case WM_TIMER:
+    hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+    SelectObject(hMemDC, hPen);
     GetLocalTime(&lt);
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
+    DeleteObject(hPen);
     StretchBlt(hMemDC, w / 2 - h / 2, 0, h, h, hMemDCLogo, 0, 0, Bm.bmWidth, Bm.bmHeight, SRCCOPY);
 
-    alpha = lt.wSecond * M_PI / 30.0;
-    beta = lt.wMinute * M_PI / 30.0;
+    alpha = (lt.wSecond * M_PI + lt.wMilliseconds / 1000) / 30.0;
+    beta = (lt.wMinute * M_PI + lt.wMinute / 60) / 30.0;
     gamma = lt.wHour * M_PI / 6.0;
-
-    SetDCPenColor(hMemDC, RGB(255, 0, 0));
+    /* Seconds */
+    hPen = CreatePen(PS_SOLID, 2, RGB(10, 10, 10));
+    hOldPen = SelectObject(hMemDC, hPen);
     MoveToEx(hMemDC, w / 2, h / 2, NULL);     
     LineTo(hMemDC, (INT)(w / 2 + sin(alpha) * h / 2), 
       (INT)(h / 2 - cos(alpha) * h / 2));
+    SelectObject(hMemDC, hOldPen);
+    DeleteObject(hPen);
+    /* Minutes */
+    hPen = CreatePen(PS_SOLID, 5, RGB(0, 0, 50));
+    hOldPen = SelectObject(hMemDC, hPen);
     MoveToEx(hMemDC, w / 2, h / 2, NULL);
-    LineTo(hMemDC, (INT)(w / 2 + sin(beta) * h / 2), 
-      (INT)(h / 2 - cos(beta) * h / 2));
+    LineTo(hMemDC, (INT)(w / 2 + sin(beta) * h / 3), 
+      (INT)(h / 2 - cos(beta) * h / 3));
+    SelectObject(hMemDC, hOldPen);
+    DeleteObject(hPen);
+    /* Hours */
+    hPen = CreatePen(PS_SOLID, 10, RGB(100, 0, 0));
+    hOldPen = SelectObject(hMemDC, hPen);
     MoveToEx(hMemDC, w / 2, h / 2, NULL);
-    LineTo(hMemDC, (INT)(w / 2 + sin(gamma) * h / 2), 
-      (INT)(h / 2 - cos(gamma) * h / 2));
+    LineTo(hMemDC, (INT)(w / 2 + sin(gamma) * h / 4), 
+      (INT)(h / 2 - cos(gamma) * h / 4));
+    SelectObject(hMemDC, hOldPen);
+    DeleteObject(hPen);
+
+    hPen = CreatePen(PS_SOLID, 10, RGB(0, 0, 0));
+    hOldPen = SelectObject(hMemDC, hPen);
+    Ellipse(hMemDC, w / 2 - 5, h / 2 + 5, w / 2 + 5, h / 2 - 5);
+
+    TextOut(hMemDC, 20, h - 50, Data, sprintf(Data, "%02i.%02i.%04i;"
+      "  Time: %02i:%02i:%02i", lt.wDay, lt.wMonth, lt.wYear, lt.wHour, lt.wMinute, lt.wSecond));
 
     SetBkMode(hMemDC, TRANSPARENT);
     InvalidateRect(hWnd, NULL, FALSE);
+
+    SelectObject(hMemDC, hOldPen);
+    DeleteObject(hPen);
     return 0;
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
