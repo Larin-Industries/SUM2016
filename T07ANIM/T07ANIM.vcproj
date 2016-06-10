@@ -182,6 +182,42 @@
 				RelativePath=".\MAIN.C"
 				>
 			</File>
+			<Filter
+				Name="Animation Sumple"
+				>
+				<File
+					RelativePath=".\ANIM.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM.H"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS.C"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Math Support"
+				>
+				<File
+					RelativePath=".\VEC.H"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Units Sumples"
+				>
+				<File
+					RelativePath=".\U_BALL.C"
+					>
+				</File>
+				<File
+					RelativePath=".\U_SPHERE.C"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -189,7 +225,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\VEC.H"
+				RelativePath=".\DEF.H"
 				>
 			</File>
 		</Filter>

@@ -1,16 +1,14 @@
-/* FILE NAME: T07ANIM.C
+/* FILE NAME: VEC.H
  * PROGRAMMER: AL5
- * DATE: 08.06.2016
+ * DATE: 10.06.2016
  * PURPOSE: WinAPI windowed application sample.
  */
 #include <math.h>
-#include <windows.h>
+
+#include "DEF.H"
 
 #define M_PI 3.14159265358979
 #define D2R(A) ((A) * M_PI / 180.0)
-
-/* basic material type */
-typedef double DBL;
 
 /* type for vectors in space */
 typedef struct tagVEC
@@ -382,4 +380,25 @@ __inline MATR MatrInverse( MATR M )
   r.A[3][2] = -MatrDeterm3x3(M.A[0][0], M.A[0][1], M.A[0][2],
                              M.A[1][0], M.A[1][1], M.A[1][2],
                              M.A[2][0], M.A[2][1], M.A[2][2]) / det;
+  return r;
 } /* end of 'MatrInverse' function */
+
+/* Random number obtain in range [0.0 .. 1.0] function.
+ * ARGUMENTS: None.
+ * RETURNS:
+ *   (DBL) result random number.
+ */
+__inline DBL Rnd0( VOID )
+{
+  return (DBL)rand() / RAND_MAX;
+} /* End of 'Rnd0' function */
+
+/* Random number obtain in range [-1.0 .. 1.0] function.
+ * ARGUMENTS: None.
+ * RETURNS:
+ *   (DBL) result random number.
+ */
+__inline DBL Rnd1( VOID )
+{
+  return 2.0 * rand() / RAND_MAX - 1;
+} /* End of 'Rnd1' function */

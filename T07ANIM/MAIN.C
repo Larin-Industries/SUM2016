@@ -1,20 +1,22 @@
 /* FILE NAME: T07ANIM.C
  * PROGRAMMER: AL5
- * DATE: 08.06.2016
+ * DATE: 10.06.2016
  * PURPOSE: WinAPI windowed application sample.
  */
 
-#include "VEC.H"
+#include "ANIM.H"
 
-#define WND_CLASS_NAME "Larin Industries"
+#define AL5_WND_CLASS_NAME "Larin Industries"
 
-LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
+LRESULT CALLBACK AL5_WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
 
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd )
 {
   HWND hWnd;
   WNDCLASS wc;
   MSG msg;
+
+  SetDbgMemHooks();
 
   wc.style = CS_HREDRAW | CS_VREDRAW;
   wc.cbClsExtra = 0;
@@ -23,9 +25,9 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   wc.hIcon = LoadIcon(NULL, IDI_EXCLAMATION);
   wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
   wc.hInstance = hInstance;
-  wc.lpszClassName = WND_CLASS_NAME;
+  wc.lpszClassName = AL5_WND_CLASS_NAME;
   wc.lpszMenuName = NULL;
-  wc.lpfnWndProc = MyWinFunc;
+  wc.lpfnWndProc = AL5_WinFunc;
 
   if (!RegisterClass(&wc))
   {
@@ -33,7 +35,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
     return 0;
   }
 
-  hWnd = CreateWindow(WND_CLASS_NAME,
+  hWnd = CreateWindow(AL5_WND_CLASS_NAME,
     "30!",
     WS_OVERLAPPEDWINDOW,
     CW_USEDEFAULT, CW_USEDEFAULT,
@@ -43,17 +45,18 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
 
+  AL5_AnimAddUnit(AL5_UnitCreateSphere());
+
   while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
 
-  return msg.wParam;
+  return 0;
 } /* End of 'WinMain' function */
 
-LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK AL5_WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
   PAINTSTRUCT ps;
-  static INT w, h;
   static HBITMAP hBm;
   static HDC hMemDC;
 
@@ -61,36 +64,33 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   {
   case WM_CREATE:
     SetTimer(hWnd, 30, 10, NULL);
-    hDC = GetDC(hWnd);
-    hMemDC = CreateCompatibleDC(hDC);
-    ReleaseDC(hWnd, hDC);
+    AL5_AnimInit(hWnd);
     return 0;
   case WM_SIZE:
-    w = LOWORD(lParam);
-    h = HIWORD(lParam);
-    if (hBm != NULL)
-      DeleteObject(hBm);
-    hDC = GetDC(hWnd);
-    hBm = CreateCompatibleBitmap(hDC, w, h);
-    ReleaseDC(hWnd, hDC);
-    SelectObject(hMemDC, hBm);
+    AL5_AnimResize(LOWORD(lParam), HIWORD(lParam));
     SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_MOUSEMOVE:
     InvalidateRect(hWnd, NULL, FALSE);
     return 0;
+  case WM_KEYDOWN:
+    if (VK_SPACE)
+      AL5_AnimAddUnit(AL5_UnitCreateBall());
+    return 0;
   case WM_TIMER:
-    Rectangle(hMemDC, 0, 0, w + 1, h + 1);
-    InvalidateRect(hWnd, NULL, FALSE);
+    AL5_AnimRender();
+    return 0;
+  case WM_ERASEBKGND:
     return 0;
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
-    BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
+    AL5_AnimCopyFrame(hDC);
     EndPaint(hWnd, &ps);
     return 0;
-  case WM_DESTROY:
-    DeleteObject(hBm);
-    DeleteDC(hMemDC);
+  case WM_DESTROY:    
+    AL5_AnimClose();
+//    DeleteObject(hBm);
+//    DeleteDC(hMemDC);
     PostMessage(hWnd, WM_QUIT, 0, 0);
     KillTimer(hWnd, 30);
     return 0;
