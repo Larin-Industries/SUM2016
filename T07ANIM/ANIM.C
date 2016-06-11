@@ -8,6 +8,8 @@
 
 al5ANIM AL5_Anim;
 
+INT AL5_MouseWheel;
+
 VOID AL5_AnimInit( HWND hWnd )
 {
   HDC hDC;
@@ -73,14 +75,67 @@ VOID AL5_AnimClose( VOID )
 VOID AL5_AnimRender( VOID )
 {
   INT i;
+  POINT pt;
 
   /*** Obtain input system state ***/
 
-  /* Keyboard */
-
   /* Mouse */
+
+  GetCursorPos(&pt);
+  ScreenToClient(AL5_Anim.hWnd, &pt);
+  AL5_Anim.Mx = pt.x;
+  AL5_Anim.My = pt.y;
+
+  AL5_Anim.Mdx = pt.x - AL5_Anim.MOldx;
+  AL5_Anim.Mdy = pt.y - AL5_Anim.MOldy;
+  AL5_Anim.MOldx = AL5_Anim.Mx;
+  AL5_Anim.MOldy = AL5_Anim.My;
+
+  GetKeyboardState(AL5_Anim.Keys);
+
+  AL5_Anim.Mdz = AL5_MouseWheel;
+  AL5_Anim.Mz = AL5_MouseWheel;
+  AL5_MouseWheel = 0;
+
+  /* Keyboard */
   
+  GetKeyboardState(AL5_Anim.Keys);
+  for (i = 0; i < 256; i++)
+  {
+    AL5_Anim.Keys[i] >>= 7;
+    if (!AL5_Anim.KeysOld[i] && AL5_Anim.Keys[i])
+      AL5_Anim.KeysOld[i] = TRUE;
+    else
+      AL5_Anim.KeysOld[i] = FALSE;
+  }
+
+  memcpy(AL5_Anim.KeysOld, AL5_Anim.Keys, 256);
+
   /* Joystick */
+
+  if (joyGetNumDevs() > 0)
+  {
+    JOYCAPS jc;
+    if (joyGetDevCaps(JOYSTICKID1, &jc, sizeof(jc)) == JOYERR_NOERROR)
+    {
+      JOYINFOEX ji;
+      
+      ji.dwSize = sizeof(JOYINFOEX);
+      ji.dwFlags = JOY_RETURNALL;
+      if (joyGetPosEx(JOYSTICKID1, &ji) == JOYERR_NOERROR)
+      {
+        for (i = 0; i < 32; i++)
+          AL5_Anim.JBut[i] = (ji.dwButtons >> i) & 1;
+
+        AL5_Anim.JX = 2.0 * (ji.dwXpos - jc.wXmin) / (jc.wXmax - jc.wXmin - 1) - 1;
+        AL5_Anim.JY = 2.0 * (ji.dwYpos - jc.wYmin) / (jc.wYmax - jc.wYmin - 1) - 1;
+        AL5_Anim.JZ = 2.0 * (ji.dwZpos - jc.wZmin) / (jc.wZmax - jc.wZmin - 1) - 1;
+        AL5_Anim.JR = 2.0 * (ji.dwRpos - jc.wRmin) / (jc.wRmax - jc.wRmin - 1) - 1;
+
+        AL5_Anim.JPov = ji.dwPOV == 0xFFFF ? 0 : ji.dwPOV / 4500 + 1;
+      }
+    }
+  }
 
   for (i = 0; i < AL5_Anim.NumOfUnits; i++)
     AL5_Anim.Units[i]->Response(AL5_Anim.Units[i], &AL5_Anim);

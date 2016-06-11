@@ -29,10 +29,10 @@ typedef struct
  */
 static VOID AL5_UnitInit( al5UNIT_BALL *Uni, al5ANIM *Ani )
 {
-  Uni->Pos = VecSet(Rnd0() * 1920, Rnd0() * 1080, 0);
-  Uni->TimerShift = Rnd1() * 59;
-  Uni->TimerSpeed = Rnd1() * 8;
-  Uni->Color = RGB(Rnd0() * 255, Rnd0() * 255, Rnd0() * 255);
+  Uni->Pos = VecSet(Ani->W / 2, Ani->H / 2, 0);
+  Uni->TimerShift = 9;
+  Uni->TimerSpeed = 8;
+  Uni->Color = RGB(55, 255, 5);
 } /* End of 'AL5_UnitInit' function */
 
 /* Unit ball inter frame events handle function.
@@ -45,9 +45,7 @@ static VOID AL5_UnitInit( al5UNIT_BALL *Uni, al5ANIM *Ani )
  */
 static VOID AL5_UnitResponse( al5UNIT_BALL *Uni, al5ANIM *Ani )
 {
-  DBL t = Uni->TimerSpeed * clock() / 1000.0 + Uni->TimerShift;
-
-  Uni->Shift = VecSet(30 * sin(t), 30 * cos(t), 0);
+  Uni->Shift = VecSet(30 * Ani->JX, 30 * Ani->JY, 0);
 } /* End of 'AL5_UnitResponse' function */
 
 /* Unit render function.

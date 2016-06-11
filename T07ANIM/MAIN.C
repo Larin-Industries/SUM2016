@@ -45,7 +45,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
 
-  AL5_AnimAddUnit(AL5_UnitCreateSphere());
+  AL5_AnimAddUnit(AL5_UnitCreateBallCont());
 
   while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
@@ -72,6 +72,9 @@ LRESULT CALLBACK AL5_WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam 
     return 0;
   case WM_MOUSEMOVE:
     InvalidateRect(hWnd, NULL, FALSE);
+    return 0;
+  case WM_MOUSEWHEEL:
+    AL5_MouseWheel += (SHORT)HIWORD(wParam);
     return 0;
   case WM_KEYDOWN:
     if (VK_SPACE)

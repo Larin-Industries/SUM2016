@@ -5,8 +5,13 @@
  */
 
 #include "DEF.H"
+#include <mmsystem.h>
+
+#pragma comment(lib, "winmm")
 
 #define AL5_MAX_UNITS 1000000
+
+extern AL5_MouseWheel;
 
 typedef struct tagal5UNIT al5UNIT;
 
@@ -17,8 +22,17 @@ typedef struct
   INT W, H;  
   HBITMAP hFrame;
   al5UNIT *Units[AL5_MAX_UNITS];
-  INT NumOfUnits;
+  INT NumOfUnits;                  /* Number of units */
+  BYTE JBut[32];                   /* Joystick buttons */
+  DBL JX, JY, JZ, JR;              /* Joystick axes */
+  INT JPov;                        /* Point of viev */
+  INT Mx, My, Mz,                  /* Mouse coordinates */
+    Mdx, Mdy, Mdz,
+    MOldx, MOldy, MOldz;
+  BYTE Keys[256], KeysOld[256],    /* Keyboard keys */
+    KeyClick[256];
 } al5ANIM;
+
 
 struct tagal5UNIT
 {
