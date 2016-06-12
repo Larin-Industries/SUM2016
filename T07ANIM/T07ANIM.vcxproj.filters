@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Animation Sumple">
+      <UniqueIdentifier>{37a6baa6-1353-455a-8e97-0d484cdf5909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Math Support">
+      <UniqueIdentifier>{d6c192ea-6e8a-49f5-81de-9b75b46ac376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Units Sumples">
+      <UniqueIdentifier>{2b4c79d9-cc92-4661-bd02-f2f8ffa4d922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MAIN.C">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ANIM.C">
+      <Filter>Source Files\Animation Sumple</Filter>
+    </ClCompile>
+    <ClCompile Include="UNITS.C">
+      <Filter>Source Files\Animation Sumple</Filter>
+    </ClCompile>
+    <ClCompile Include="U_BALL.C">
+      <Filter>Source Files\Units Sumples</Filter>
+    </ClCompile>
+    <ClCompile Include="U_BALL_CONT.C">
+      <Filter>Source Files\Units Sumples</Filter>
+    </ClCompile>
+    <ClCompile Include="U_SPHERE.C">
+      <Filter>Source Files\Units Sumples</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ANIM.H">
+      <Filter>Source Files\Animation Sumple</Filter>
+    </ClInclude>
+    <ClInclude Include="VEC.H">
+      <Filter>Source Files\Math Support</Filter>
+    </ClInclude>
+    <ClInclude Include="DEF.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
