@@ -76,3 +76,35 @@ struct tagal5UNIT
    */
   VOID (*Render)( al5UNIT *Uni, al5ANIM *Ani );
 };
+
+VOID AL5_AnimAddUnit( al5UNIT *Uni );
+VOID AL5_AnimInit( HWND hWnd );
+VOID AL5_AnimResize( INT W, INT H );
+VOID AL5_AnimCopyFrame( HDC hDC );
+VOID AL5_AnimRender( VOID );
+VOID AL5_AnimClose( VOID );
+al5UNIT * AL5_AnimUnitCreate( INT Size );
+
+
+/*** Render support ***/
+
+extern MATR
+  AL5_RndMatrWorld,
+  AL5_RndMatrView,
+  AL5_RndMatrProj;
+
+extern DBL
+  AL5_RndProjDist,
+  AL5_RndFarClip,
+  AL5_RndProjSize;
+
+typedef struct
+{
+  VEC *P;          /* Primitive points */
+  INT NumOfP;      /* Point array size */
+  INT (*Edges)[2]; /* Edges array - array of points */
+  INT NumOfE;      /* Edges array size */
+} al5PRIM;
+
+VOID AL5_RndPrimDraw( al5PRIM *Pr );
+MATR MatrView( VEC Loc, VEC Add, VEC Up );

@@ -22,6 +22,10 @@ VOID AL5_AnimInit( HWND hWnd )
   AL5_Anim.hDC = CreateCompatibleDC(hDC);
   ReleaseDC(hWnd, hDC);
   AL5_Anim.NumOfUnits = 0;
+
+  AL5_RndMatrWorld = MatrIdentity();
+  AL5_RndMatrView = MatrView(VecSet(5, 5, 5), VecSet(0, 0, 0), VecSet(0, 1, 0));
+  AL5_RndMatrProj = Frustum(-1, 1, -1, 1, 1, 100);
 }
 
 VOID AL5_AnimResize( INT W, INT H )
@@ -40,6 +44,8 @@ VOID AL5_AnimResize( INT W, INT H )
 
   ReleaseDC(AL5_Anim.hWnd, hDC);
   SelectObject(AL5_Anim.hDC, AL5_Anim.hFrame);
+
+  AL5_RndSetProj();
 }
 
 VOID AL5_AnimCopyFrame( HDC hDC )

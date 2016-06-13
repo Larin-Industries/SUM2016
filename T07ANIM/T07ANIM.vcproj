@@ -194,6 +194,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\RENDER.C"
+					>
+				</File>
+				<File
 					RelativePath=".\UNITS.C"
 					>
 				</File>
@@ -218,6 +222,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\U_CUBE.C"
+					>
+				</File>
+				<File
 					RelativePath=".\U_SPHERE.C"
 					>
 				</File>
@@ -230,6 +238,10 @@
 			>
 			<File
 				RelativePath=".\DEF.H"
+				>
+			</File>
+			<File
+				RelativePath=".\UNITS.H"
 				>
 			</File>
 		</Filter>

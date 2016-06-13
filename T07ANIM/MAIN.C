@@ -5,6 +5,7 @@
  */
 
 #include "ANIM.H"
+#include "UNITS.H"
 
 #define AL5_WND_CLASS_NAME "Larin Industries"
 
@@ -46,7 +47,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   UpdateWindow(hWnd);
 
   AL5_AnimAddUnit(AL5_UnitCreateBallCont());
-  AL5_AnimAddUnit(AL5_UnitCreateSphere());
+  AL5_AnimAddUnit(AL5_UnitCreateCube());
 
   while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
@@ -78,8 +79,8 @@ LRESULT CALLBACK AL5_WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam 
     AL5_MouseWheel += (SHORT)HIWORD(wParam);
     return 0;
   case WM_KEYDOWN:
-//    if (VK_SPACE)
-//      AL5_AnimAddUnit(AL5_UnitCreateBall());
+    if (VK_SPACE)
+      AL5_AnimAddUnit(AL5_UnitCreateBall());
     return 0;
   case WM_TIMER:
     AL5_AnimRender();
@@ -93,6 +94,8 @@ LRESULT CALLBACK AL5_WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam 
     return 0;
   case WM_DESTROY:    
     AL5_AnimClose();
+//    DeleteObject(hBm);
+//    DeleteDC(hMemDC);
     PostMessage(hWnd, WM_QUIT, 0, 0);
     KillTimer(hWnd, 30);
     return 0;

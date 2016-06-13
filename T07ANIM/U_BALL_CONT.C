@@ -50,7 +50,7 @@ static VOID AL5_UnitResponse( al5UNIT_BALL_CONT *Uni, al5ANIM *Ani )
     bY += 30.0 * Ani->JY;
   }
   
-  Uni->Shift = VecSet(Ani->Mx, Ani->My, 0);
+  Uni->Shift = VecSet(bX, bY, 0);
 
   if (Ani->JBut[1])
     bX = Ani->W / 2, bY = Ani->H / 2;

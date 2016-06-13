@@ -1,9 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T07ANIM", "T07ANIM.vcxproj", "{ACB9ED5F-314F-4E3B-9BCE-C7B12A799208}"
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T07ANIM", "T07ANIM.vcproj", "{ACB9ED5F-314F-4E3B-9BCE-C7B12A799208}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
