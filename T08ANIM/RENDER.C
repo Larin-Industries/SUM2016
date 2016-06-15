@@ -4,71 +4,31 @@
  * PURPOSE: Render, just render...
  */
 
+#include "ANIM.H"
 #include <stdio.h>
 
-#include "ANIM.H"
+MATR AL5_RndMatrWorld/* = MatrIdentity()*/,
+     AL5_RndMatrView /* = MatrMulMatr(MatrIdentity, MatrTranslate(VecSet(-1, -1, 0)))*/,
+     AL5_RndMatrProj;
 
-al5ANIM AL5_Anim;
+FLT  AL5_RndProjDist  =   0.1,
+     AL5_RndFarClip   =  100,
+     AL5_RndProjSize  =   0.1;
 
-MATR
-  AL5_RndMatrWorld,
-  AL5_RndMatrView,
-  AL5_RndMatrProj;
-
-DBL
-  AL5_RndProjDist = 0.1,
-  AL5_RndFarClip = 90,
-  AL5_RndProjSize = 0.1;
-
-MATR MatrFrustum( DBL l, DBL r, DBL b, DBL t, DBL n, DBL f )
+VOID AL5_RndProj( VOID )
 {
-  MATR M = 
-  {
-    {
-      {2 * n / (r - l)  , 0                , 0                   , 0},
-      {0                , 2 * n / (t - b)  , 0                   , 0},
-      {(r + l) / (r - l), (t + b) / (t - b), -(f + n) / (f - n)  ,-1},
-      {0                , 0                , -2 * n * f / (f - n), 0}
-    }
-  };
-
-  return M;
-}
-
-MATR MatrView( VEC Loc, VEC Add, VEC Up1 )
-{
-  VEC
-    Dir = VecNormalize(VecSubVec(Add, Loc)),
-    Right = VecNormalize(VecCrossVec(Dir, Up1)),
-    Up = VecNormalize(VecCrossVec(Right, Dir));
-  MATR m = 
-  {
-    {
-      {Right.X               , Up.X                , - Dir.X            , 0},
-      {Right.Y               , Up.Y                , - Dir.Y            , 0},
-      {Right.Z               , Up.Z                , - Dir.Z            , 0},
-      {-VecDotVec(Loc, Right), - VecDotVec(Loc, Up), VecDotVec(Loc, Dir), 1}
-    }
-  };
-
-  return m;
-}
-
-VOID AL5_RndSetProj( VOID )
-{
-  DBL ratio_x = 1, ratio_y = 1;
-
+  FLT ratio_x = 1, ratio_y = 1;
   if (AL5_Anim.W >= AL5_Anim.H)
-    ratio_x = (DBL)AL5_Anim.W / AL5_Anim.H;
+    ratio_x = (FLT)AL5_Anim.W / AL5_Anim.H;
   else
-    ratio_y = (DBL)AL5_Anim.H / AL5_Anim.W;
-
+    ratio_y = (FLT)AL5_Anim.H / AL5_Anim.W;
   AL5_RndMatrProj = MatrFrustum(-ratio_x * AL5_RndProjSize / 2,
                                  ratio_x * AL5_RndProjSize / 2,
                                 -ratio_y * AL5_RndProjSize / 2,
                                  ratio_y * AL5_RndProjSize / 2,
                                  AL5_RndProjDist, AL5_RndFarClip);
-} /* End of 'AL5_RndSetProj' function */
+}
+
 
 /* Primitive draw function.
  * ARGUMENTS:
@@ -78,7 +38,7 @@ VOID AL5_RndSetProj( VOID )
  */
 VOID AL5_RndPrimDraw( al5PRIM *Pr )
 {
-  INT i;
+  INT loc;
   MATR M;
 
   /* Build transform matrix */
@@ -86,14 +46,26 @@ VOID AL5_RndPrimDraw( al5PRIM *Pr )
     MatrMulMatr(AL5_RndMatrView, AL5_RndMatrProj));
   glLoadMatrixf(M.A[0]);
 
-  /* Draw all lines */
-  glBegin(GL_TRIANGLES);
-  for (i = 0; i < Pr->NumOfI; i++)
-  {
-    glColor3fv(&Pr->V[Pr->I[i]].C.X);
-    glVertex3fv(&Pr->V[Pr->I[i]].P.X);
-  }
-  glEnd();
+  glUseProgram(AL5_RndPrg);
+
+  /* Setup global variables */
+  if ((loc = glGetUniformLocation(AL5_RndPrg, "MatrWorld")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, AL5_RndMatrWorld.A[0]);
+  if ((loc = glGetUniformLocation(AL5_RndPrg, "MatrView")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, AL5_RndMatrView.A[0]);
+  if ((loc = glGetUniformLocation(AL5_RndPrg, "MatrProj")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, AL5_RndMatrProj.A[0]);
+  if ((loc = glGetUniformLocation(AL5_RndPrg, "Time")) != -1)
+    glUniform1f(loc, AL5_Anim.Time);
+
+
+  /* Activete primitive vertex array */
+  glBindVertexArray(Pr->VA);
+  /* Activete primitive index buffer */
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->IBuf);
+  /* Draw primitive */
+  glDrawElements(GL_TRIANGLES, Pr->NumOfI, GL_UNSIGNED_INT, NULL);
+  glUseProgram(0);
 } /* End of 'AL5_RndPrimDraw' function */
 
 /* Primitive free function.
@@ -104,24 +76,14 @@ VOID AL5_RndPrimDraw( al5PRIM *Pr )
  */
 VOID AL5_RndPrimFree( al5PRIM *Pr )
 {
-  if (Pr->V != NULL)
-    free(Pr->V);
-  if (Pr->I != NULL)
-    free(Pr->I);
+  glBindVertexArray(Pr->VA);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glDeleteBuffers(1, &Pr->VBuf);
+  glBindVertexArray(0);
+  glDeleteVertexArrays(1, &Pr->VA);
+  glDeleteBuffers(1, &Pr->IBuf);
   memset(Pr, 0, sizeof(al5PRIM));
 } /* End of 'AL5_RndPrimFree' function */
-
-VEC4 Vec4Set( DBL X, DBL Y, DBL Z, DBL W )
-{
-  VEC4 p;
-
-  p.X = X;
-  p.Y = Y;
-  p.Z = Z;
-  p.W = W;
-
-  return p;
-}
 
 /* Load primitive from '*.g3d' file function.
  * ARGUMENTS:
@@ -138,10 +100,12 @@ BOOL AL5_RndPrimLoad( al5PRIM *Pr, CHAR *FileName )
   DWORD Sign;
   INT NumOfPrimitives;
   CHAR MtlFile[300];
-  INT NumOfP;
+  INT NumOfV;
   INT NumOfI;
   CHAR Mtl[300];
   INT p;
+  al5VERTEX *V;
+  INT *I;
 
   memset(Pr, 0, sizeof(al5PRIM));
 
@@ -154,10 +118,10 @@ BOOL AL5_RndPrimLoad( al5PRIM *Pr, CHAR *FileName )
    *   4b NumOfPrimitives       INT NumOfPrimitives;
    *   300b material file name: CHAR MtlFile[300];
    *   repeated NumOfPrimitives times:
-   *     4b INT NumOfP; - vertex count
+   *     4b INT NumOfV; - vertex count
    *     4b INT NumOfI; - index (triangles * 3) count
    *     300b material name: CHAR Mtl[300];
-   *     repeat NumOfP times - vertices:
+   *     repeat NumOfV times - vertices:
    *         !!! float point -> FLT
    *       typedef struct
    *       {
@@ -180,41 +144,72 @@ BOOL AL5_RndPrimLoad( al5PRIM *Pr, CHAR *FileName )
   for (p = 0; p < NumOfPrimitives; p++)
   {
     /* Read primitive info */
-    fread(&NumOfP, 4, 1, F);
+    fread(&NumOfV, 4, 1, F);
     fread(&NumOfI, 4, 1, F);
     fread(Mtl, 1, 300, F);
 
     /* Allocate memory for primitive */
-    if ((Pr->V = malloc(sizeof(al5VERTEX) * NumOfP)) == NULL)
+    if ((V = malloc(sizeof(al5VERTEX) * NumOfV)) == NULL)
     {
       fclose(F);
       return FALSE;
     }
-    if ((Pr->I = malloc(sizeof(INT) * NumOfI)) == NULL)
+    if ((I = malloc(sizeof(INT) * NumOfI)) == NULL)
     {
-      free(Pr->V);
-      Pr->V = NULL;
+      free(V);
+      V = NULL;
       fclose(F);
       return FALSE;
     }
-    Pr->NumOfV = NumOfP;
     Pr->NumOfI = NumOfI;
-    fread(Pr->V, sizeof(al5VERTEX), NumOfP, F);
-    fread(Pr->I, sizeof(INT), NumOfI, F);
-    if (Pr->NumOfV > 0)
-    {
-      INT i;
+    fread(V, sizeof(al5VERTEX), NumOfV, F);
+    fread(I, sizeof(INT), NumOfI, F);
 
-      for (i = 0; i < Pr->NumOfV; i++)
-        Pr->V[i].C = Vec4Set(Pr->V[i].N.X / 2 + 0.5,
-                             Pr->V[i].N.Y / 2 + 0.5,
-                             Pr->V[i].N.Z / 2 + 0.5, 1);
-    }
+    /* Create OpenGL buffers */
+    glGenVertexArrays(1, &Pr->VA);
+    glGenBuffers(1, &Pr->VBuf);
+    glGenBuffers(1, &Pr->IBuf);
+
+    /* Activate vertex array */
+    glBindVertexArray(Pr->VA);
+    /* Activate vertex buffer */
+    glBindBuffer(GL_ARRAY_BUFFER, Pr->VBuf);
+    /* Store vertex data */
+    glBufferData(GL_ARRAY_BUFFER, sizeof(al5VERTEX) * NumOfV, V, GL_STATIC_DRAW);
+
+    /* Setup data order */
+    /*                    layout,
+     *                      components count,
+     *                          type
+     *                                    should be normalize,
+     *                                           vertex structure size in bytes (stride),
+     *                                               offset in bytes to field start */
+    glVertexAttribPointer(0, 3, GL_FLOAT, FALSE, sizeof(al5VERTEX),
+                          (VOID *)0); /* position */
+    glVertexAttribPointer(1, 2, GL_FLOAT, FALSE, sizeof(al5VERTEX),
+                          (VOID *)sizeof(VEC)); /* texture coordinates */
+    glVertexAttribPointer(2, 3, GL_FLOAT, FALSE, sizeof(al5VERTEX),
+                          (VOID *)(sizeof(VEC) + sizeof(VEC2))); /* normal */
+    glVertexAttribPointer(3, 4, GL_FLOAT, FALSE, sizeof(al5VERTEX),
+                          (VOID *)(sizeof(VEC) * 2 + sizeof(VEC2))); /* color */
+
+    /* Enable used attributes */
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
+
+    /* Indices */
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->IBuf);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(INT) * NumOfI, I, GL_STATIC_DRAW);
+
+    /* Disable vertex array */
+    glBindVertexArray(0);
+
+    free(V);
+    free(I);
     break;
   }
   fclose(F);
   return TRUE;
 } /* End of 'AL5_RndPrimLoad' function */
-
-
-/* END OF 'RENDER.C' FILE */

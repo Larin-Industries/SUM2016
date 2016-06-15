@@ -1,5 +1,5 @@
 /* FILE NAME: U_BALL.C
- * PROGRAMMER: VG4
+ * PROGRAMMER: AL5
  * DATE: 10.06.2016
  * PURPOSE: Ball unit sample.
  */
