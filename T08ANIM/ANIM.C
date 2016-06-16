@@ -78,8 +78,6 @@ VOID AL5_AnimInit( HWND hWnd )
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
 
   AL5_RndPrg = AL5_RndShaderLoad("a");
-
-  AL5_RndShaderFree(AL5_RndPrg);
 }
 
 VOID AL5_AnimResize( INT w,INT h )
@@ -215,7 +213,7 @@ VOID AL5_AnimRender( VOID )
                                          (FLT)(t.QuadPart - AL5_OldTimeFPS);
     AL5_OldTimeFPS = t.QuadPart;
     AL5_FrameCounter = 0;
-    sprintf(str, "Anim FPS: %.5f Mouse Coord:  %i, %i JoyStick Coord: %f %f", AL5_Anim.FPS, AL5_Anim.Mx, AL5_Anim.My, AL5_Anim.JX,AL5_Anim.JX);
+    sprintf(str, "Anim FPS: %.5f Mouse Coord:  %i, %i JoyStick Coord: %f %f; Number of units: %i", AL5_Anim.FPS, AL5_Anim.Mx, AL5_Anim.My, AL5_Anim.JX,AL5_Anim.JX, AL5_Anim.NumOfUnits - 1);
     SetWindowText(AL5_Anim.hWnd, str);
   }
   AL5_OldTime = t.QuadPart;  

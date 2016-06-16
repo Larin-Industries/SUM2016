@@ -26,7 +26,7 @@ static VOID AL5_RndShaderLog( CHAR *Stage, CHAR *Text )
     fprintf(F, "%s: %s\n", Stage, Text);
     fclose(F);
   }
-} /* End of 'AL5_RndShaderLoadTextFile' function */
+} /* End of 'VG4_RndShaderLoadTextFile' function */
 
 /* Text file load to memory function.
  * ARGUMENTS:

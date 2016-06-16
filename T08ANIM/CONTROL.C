@@ -17,7 +17,7 @@ typedef struct
 
 static VOID AL5_UnitInit( al5CONTROL *Uni, al5ANIM *Ani )
 {   
-  Uni->Pos = VecSet(2, 2, 2);
+  Uni->Pos = VecSet(10, 15, 10);
 } /* End of 'AL5_UnitInit' function */
 
 static VOID AL5_UnitRender( al5CONTROL *Uni, al5ANIM *Ani )
@@ -28,6 +28,8 @@ static VOID AL5_UnitRender( al5CONTROL *Uni, al5ANIM *Ani )
 static VOID AL5_UnitResponse( al5CONTROL *Uni, al5ANIM *Ani )
 {
   DBL r;
+  VEC Dir = VecNormalize(VecSubVec(VecSet(0, 0, 0), Uni->Pos)),
+    Right = VecNormalize(VecCrossVec(Dir, VecSet(0, 1, 0)));
 
   if (Ani->Keys['T'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -37,30 +39,32 @@ static VOID AL5_UnitResponse( al5CONTROL *Uni, al5ANIM *Ani )
     glPolygonMode(GL_BACK, GL_LINE);
   /*if (Ani->Keys[VK_SPACE])
     AL5_AnimAddUnit(AL5_UnitCreateBall()); */
-  if (Ani->Keys['C'])
-    AL5_AnimAddUnit(AL5_UnitCreateCube(Rnd0() * 50, Rnd0() * 50, Rnd0() * 50));
+  if (Ani->KeysClick['C'])
+    AL5_AnimAddUnit(AL5_UnitCreateCube(100, 100, 100));
   if (Ani->KeysClick[VK_RETURN] && Ani->Keys[VK_MENU])
     AL5_FlipFullScreen(AL5_Anim.hWnd);
-  /*if (Ani->KeysClick[VK_ESCAPE])
-    AL5_AnimDoExit();*/
+  /* if (Ani->KeysClick[VK_ESCAPE])
+    AL5_AnimDoExit(); */
   if (Ani->KeysClick['P'])
     Ani->IsPause = !Ani->IsPause;
 
   /* Uni->Pos.Y += Ani->JY * Ani->GlobalDeltaTime; */
-  Uni->Pos = PointTransform(Uni->Pos, MatrRotateX(10 * Ani->JY * Ani->GlobalDeltaTime));
-  Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(10 * Ani->JX * Ani->GlobalDeltaTime));
+
+  Uni->Pos = PointTransform(Uni->Pos, MatrRotate((20 * Ani->JY * Ani->GlobalDeltaTime), Right));
+  Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(5 * Ani->JX * Ani->GlobalDeltaTime));
 
   if (Ani->Keys[VK_LBUTTON])
   {
-    Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(10 * Ani->Mdx * Ani->GlobalDeltaTime));
-    Uni->Pos = PointTransform(Uni->Pos, MatrRotateX(10 * Ani->Mdy * Ani->GlobalDeltaTime));
+    Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(2 * Ani->Mdx * Ani->GlobalDeltaTime));
+    Uni->Pos = PointTransform(Uni->Pos, MatrRotateX(2 * Ani->Mdy * Ani->GlobalDeltaTime));
   }
 
-  Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(10 * Ani->Keys[VK_RIGHT] * Ani->GlobalDeltaTime));
-  Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(-10 * Ani->Keys[VK_LEFT] * Ani->GlobalDeltaTime));
+  Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(5 * Ani->Keys[VK_RIGHT] * Ani->GlobalDeltaTime));
+  Uni->Pos = PointTransform(Uni->Pos, MatrRotateY(-5 * Ani->Keys[VK_LEFT] * Ani->GlobalDeltaTime));
 
   r = VecLen(Uni->Pos);
   Uni->Pos = VecMulNum(Uni->Pos, (r + (-Ani->Mdz) * Ani->DeltaTime * 1.0) / r);
+  Uni->Pos = VecMulNum(Uni->Pos, (r + (Ani->JZ * 10) * Ani->DeltaTime * 1.0) / r);
 
   AL5_RndMatrView = MatrView(Uni->Pos, VecSet(0, 0, 0), VecSet(0, 1, 0));
 }

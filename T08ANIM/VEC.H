@@ -367,9 +367,6 @@ __inline MATR MatrFrustum( FLT l, FLT r, FLT b, FLT t, FLT n, FLT f )
   return m;
 }
 
-
-
-
 __inline MATR MatrView( VEC Loc, VEC At, VEC Up1 )
 {
   VEC   Dir   = VecNormalize(VecSubVec(At, Loc)),

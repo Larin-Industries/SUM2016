@@ -17,14 +17,15 @@ typedef struct
 static VOID AL5_UnitInit( al5CUBE *Uni, al5ANIM *Ani )
 {  
  
-  AL5_RndPrimLoad(&Uni->p, "cow.g3d"); 
+  AL5_RndPrimLoad(&Uni->p, "biplane_complete.g3d"); 
 } /* End of 'AL5_UnitInit' function */
 
 static VOID AL5_UnitRender( al5CUBE *Uni, al5ANIM *Ani )
 {
-  AL5_RndMatrWorld = MatrMulMatr(AL5_RndMatrWorld, MatrTranslate(Uni->Pos));
+  AL5_RndMatrWorld = MatrMulMatr(MatrMulMatr(AL5_RndMatrWorld, MatrScale(VecSet(0.3, 0.3, 0.3))), MatrTranslate(Uni->Pos));
   AL5_RndPrimDraw(&Uni->p);
 }
+
 
 static VOID AL5_UnitClose( al5CUBE *Uni, al5ANIM *Ani )
 {

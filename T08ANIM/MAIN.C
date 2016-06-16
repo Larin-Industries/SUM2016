@@ -141,7 +141,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
     
-  AL5_AnimAddUnit(AL5_UnitCreateControl(3, 3, 3));
+  AL5_AnimAddUnit(AL5_UnitCreateControl(10, 10, 10));
 
   while (GetMessage(&msg, NULL, 0, 0))
   {
